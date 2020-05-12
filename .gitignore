@@ -1,3 +1,9 @@
+# macOS
+.DS_Store
+
+# CLion
+.idea/
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
