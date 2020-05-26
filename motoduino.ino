@@ -48,6 +48,7 @@ void setup() {
 ///////////////// 主程式 ////////////////
 void loop() {
     int nIRStatus;
+    int previousStatus;
 
     // 清除感測器狀態值
     byteSensorStatus = 0;
@@ -65,6 +66,11 @@ void loop() {
     nIRStatus = digitalRead(SRightRight);
     if (nIRStatus == 1)
         byteSensorStatus = (byteSensorStatus | 0x01);
+
+    if (byteSensorStatus != 7)
+        previousStatus = byteSensorStatus;
+    if (byteSensorStatus == 7)
+        byteSensorStatus = previousStatus;
 
     drivemotor(byteSensorStatus);
 }
