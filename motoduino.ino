@@ -48,7 +48,7 @@ void setup() {
 ///////////////// 主程式 ////////////////
 void loop() {
     int nIRStatus;
-    int previousStatus;
+    int previousStatus = 0;
 
     // 清除感測器狀態值
     byteSensorStatus = 0;
@@ -77,7 +77,7 @@ void loop() {
 ////////////////////////////////////////
 
 void drivemotor(byte nStatus) {
-    int lowSpeed = 100;
+    int lowSpeed = 150;
     int highSpeed = 255;
 
     Serial.println(nStatus);
