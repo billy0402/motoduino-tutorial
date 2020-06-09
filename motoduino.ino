@@ -31,6 +31,7 @@ const int Motor_M1 = 10;     // 控制馬達1正反轉 digital pin 10 of Arduino
 const int Motor_M2 = 11;    // 控制馬達2正反轉 digital pin 11 of Arduino
 // 感測器狀態值
 byte byteSensorStatus = 0;
+byte previousStatus = 7;
 
 void setup() {
     // set up serial communications
@@ -48,7 +49,6 @@ void setup() {
 ///////////////// 主程式 ////////////////
 void loop() {
     int nIRStatus;
-    int previousStatus = 0;
 
     // 清除感測器狀態值
     byteSensorStatus = 0;
@@ -67,52 +67,66 @@ void loop() {
     if (nIRStatus == 1)
         byteSensorStatus = (byteSensorStatus | 0x01);
 
-    if (byteSensorStatus != 7)
-        previousStatus = byteSensorStatus;
-    if (byteSensorStatus == 7)
-        byteSensorStatus = previousStatus;
+    byteSensorStatus = fixDirect(byteSensorStatus);
 
     drivemotor(byteSensorStatus);
 }
 ////////////////////////////////////////
 
-void drivemotor(byte nStatus) {
-    int lowSpeed = 150;
-    int highSpeed = 255;
+int fixDirect(byte nowStatus) {
+    if (nowStatus != 7)
+        Serial.println("previous & now: " + String(previousStatus) + " " + String(nowStatus));
 
-    Serial.println(nStatus);
+    if (nowStatus == 0)
+        nowStatus = previousStatus;
+//        if (previousStatus == 6 | previousStatus == 4)
+//            nowStatus = 3;
+//        if (previousStatus == 3 | previousStatus == 1)
+//            nowStatus = 6;
+
+    if (nowStatus != 0)
+        previousStatus = nowStatus;
+
+    return nowStatus;
+}
+
+void drivemotor(byte nStatus) {
+    int lowSpeed = 100;
+    int highSpeed = 200;
+
+//    Serial.println(nStatus);
 
     switch (nStatus) { // 感測器 黑色:1 白色:0
         case 7: // SL:1 SM:1 SR:1  // 黑黑黑
-            Serial.println("黑黑黑");
+//            Serial.println("黑黑黑");
             motorstop(0, 0);
             break;
         case 6: // SL:1 SM:1 SR:0  // 黑黑白
-            Serial.println("黑黑白");
+//            Serial.println("黑黑白");
             left(0, highSpeed);
             break;
         case 5: // SL:1 SM:0 SR:1  // 黑白黑
-            Serial.println("黑白黑");
+//            Serial.println("黑白黑");
             motorstop(0, highSpeed);
             break;
         case 4: // SL:1 SM:0 SR:0  // 黑白白
-            Serial.println("黑白白");
+//            Serial.println("黑白白");
             left(0, highSpeed);
             break;
         case 3: // SL:0 SM:1 SR:1 // 白黑黑
-            Serial.println("白黑黑");
+//            Serial.println("白黑黑");
             right(0, highSpeed);
             break;
         case 2: // SL:0 SM:1 SR:0  // 白黑白
-            Serial.println("白黑白");
+//            Serial.println("白黑白");
             forward(0, highSpeed);
             break;
         case 1: // SL:0 SM:0 SR:1  // 白白黑
-            Serial.println("白白黑");
+//            Serial.println("白白黑");
             right(0, highSpeed);
             break;
         case 0: // SL:0 SM:0 SR:0  // 白白白
-            Serial.println("白白白");
+//            Serial.println("白白白");
             forward(0, lowSpeed);
     }
 
